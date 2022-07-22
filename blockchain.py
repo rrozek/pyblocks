@@ -27,6 +27,10 @@ class Blockchain:
     def last_block(self) -> Block:
         return self.chain[-1]
 
+    @property
+    def prelast_block(self) -> Block:
+        return self.chain[-2]
+
     def add_block(self, block: Block, proof: str) -> bool:
         previous_hash = self.last_block.hash
         if previous_hash != block.previous_hash:
@@ -75,6 +79,8 @@ class Blockchain:
         self.pending_data.append(new_data)
 
     def load_chain(self):
+        if not Blockchain.blockchain_persistance:
+            raise FileNotFoundError
         with open(Blockchain.blockchain_persistance, "r") as chainfile:
             blocks = chainfile.readlines()
             for blockdata in blocks:
@@ -87,6 +93,8 @@ class Blockchain:
                     raise Exception("corrupt data in chain file")
 
     def store_block(self, block: Block):
+        if not Blockchain.blockchain_persistance:
+            return
         with open(Blockchain.blockchain_persistance, "a") as chainfile:
             chainfile.write(json.dumps(block.as_dict()))
             chainfile.write("\n")
