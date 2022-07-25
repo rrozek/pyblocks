@@ -17,13 +17,14 @@ def calculate_hash(data: typing.Any) -> str:
 
 class Block:
     def __init__(
-        self, height: int, data: typing.List[typing.Any], timestamp: float, previous_hash: str, nonce: int = 0
+        self, height: int, data: typing.List[typing.Any], timestamp: float, previous_hash: str, difficulty, nonce: int = 0
     ):
         self.data = data
 
         self.height = height
         self.timestamp = timestamp
         self.previous_hash = previous_hash
+        self.difficulty = difficulty
         self.data_hash = calculate_hash(self.data)
         self.nonce = nonce
 
@@ -37,6 +38,7 @@ class Block:
             "height": self.height,
             "timestamp": self.timestamp,
             "previous_hash": self.previous_hash,
+            "difficulty": self.difficulty,
             "nonce": self.nonce,
             "data": self.data,
             "hash": self.hash,

@@ -7,7 +7,7 @@ from block import Block
 
 class Blockchain:
     pow_difficulty = 2
-    blockchain_persistance = "blockchain.txt"
+    blockchain_persistance = "example_blockchain.txt"
 
     def __init__(self):
         self.pending_data = []
@@ -18,7 +18,7 @@ class Blockchain:
             self.create_genesis_block()
 
     def create_genesis_block(self):
-        genesis_block = Block(0, [], time.time(), "0")
+        genesis_block = Block(0, [], time.time(), "0", 0)
         genesis_block.hash = genesis_block.calculate_hash()
         self.chain.append(genesis_block)
         self.store_block(genesis_block)
@@ -49,23 +49,27 @@ class Blockchain:
         while not computed_hash.startswith("0" * Blockchain.pow_difficulty):
             block.nonce += 1
             computed_hash = block.calculate_hash()
-            if block.nonce % 1000 == 0:
+            if block.nonce % 50000 == 0:
                 print(f"calculated {block.nonce} PoW for block {block.height} without success")
         return computed_hash
 
     def is_pow_valid(self, block: Block, block_hash: str) -> bool:
-        return block_hash.startswith("0" * Blockchain.pow_difficulty) and block_hash == block.calculate_hash()
+        return block_hash.startswith("0" * block.difficulty) and block_hash == block.calculate_hash()
 
     def mine_block(self) -> int:
         if not self.pending_data:
-            print("nothing to mine. don`t waste enerty")
+            print("nothing to mine. don`t waste energy")
             return False
 
         print(f"mine new block")
         last_block = self.last_block
 
         new_block = Block(
-            height=last_block.height + 1, data=self.pending_data, timestamp=time.time(), previous_hash=last_block.hash
+            height=last_block.height + 1,
+            data=self.pending_data,
+            timestamp=time.time(),
+            previous_hash=last_block.hash,
+            difficulty=self.pow_difficulty,
         )
 
         proof = self.consensus_pow(new_block)
